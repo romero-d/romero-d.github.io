@@ -3,7 +3,44 @@ document.addEventListener("DOMContentLoaded", function () {
   const resultado = document.getElementById("resultado");
   const tablaBody = document.querySelector("#tablaResultados tbody");
   const graficoCanvas = document.getElementById("grafico");
+  const dataTable = document.getElementById("data-table");
+  const addRowBtn = document.getElementById("add-row");
   let grafico;
+
+  // Función para agregar filas a la tabla de entrada
+  function addRow() {
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `
+      <td><input type="number" class="form-control hora-input" min="0" max="24" step="1" required></td>
+      <td><input type="number" class="form-control temp-input" required></td>
+      <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fas fa-trash"></i></button></td>
+    `;
+    dataTable.querySelector("tbody").appendChild(newRow);
+    
+    // Agregar evento al botón de eliminar
+    newRow.querySelector(".remove-row").addEventListener("click", function() {
+      if (dataTable.querySelectorAll("tbody tr").length > 1) {
+        newRow.remove();
+      } else {
+        alert("Debe haber al menos una fila de datos");
+      }
+    });
+  }
+
+  // Evento para agregar filas
+  addRowBtn.addEventListener("click", addRow);
+
+  // Evento para eliminar filas (delegado)
+  dataTable.addEventListener("click", function(e) {
+    if (e.target.classList.contains("remove-row") || e.target.closest(".remove-row")) {
+      const row = e.target.closest("tr");
+      if (dataTable.querySelectorAll("tbody tr").length > 1) {
+        row.remove();
+      } else {
+        alert("Debe haber al menos una fila de datos");
+      }
+    }
+  });
 
   // Función de interpolación de Lagrange
   function interpolarLagrange(x, y, xi) {
@@ -190,14 +227,26 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 
-    // Obtener datos del formulario
-    const x = document.getElementById("horas").value.split(",").map(Number);
-    const y = document.getElementById("temperaturas").value.split(",").map(Number);
+    // Obtener datos de la tabla
+    const rows = dataTable.querySelectorAll("tbody tr");
+    const x = [];
+    const y = [];
+    
+    rows.forEach(row => {
+      const horaInput = row.querySelector(".hora-input");
+      const tempInput = row.querySelector(".temp-input");
+      
+      if (horaInput.value && tempInput.value) {
+        x.push(parseFloat(horaInput.value));
+        y.push(parseFloat(tempInput.value));
+      }
+    });
+
     const xi = parseFloat(document.getElementById("horaEstimada").value);
 
     // Validar datos
-    if (x.length !== y.length || x.length === 0) {
-      mostrarError("Los arreglos de datos no coinciden o están vacíos.");
+    if (x.length < 2) {
+      mostrarError("Se necesitan al menos 2 puntos de datos para la interpolación.");
       return;
     }
 

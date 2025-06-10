@@ -1,71 +1,102 @@
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("interpolation-form");
+  const calcularBtn = document.getElementById("calcularBtn");
   const resultado = document.getElementById("resultado");
-  const tablaBody = document.querySelector("#tablaResultados tbody");
+  const tablaResultadosBody = document.querySelector("#tablaResultados tbody");
+  const tablaDatos = document.getElementById("tablaDatos").querySelector("tbody");
   const ctx = document.getElementById("grafico").getContext("2d");
 
   let grafico = null;
 
-  const cleanInputData = (input) => {
-    const data = input.split(",")
-      .map(item => item.trim())
-      .filter(item => item !== "")
-      .map(Number);
+  // Agregar nueva fila a la tabla
+  document.getElementById("agregarFila").addEventListener("click", () => {
+    const fila = document.createElement("tr");
+    fila.innerHTML = `
+      <td><input type="number" class="form-control" placeholder="Día" /></td>
+      <td><input type="number" class="form-control" placeholder="Altura" /></td>
+      <td><button type="button" class="btn btn-danger btn-sm eliminar-fila"><i class="fas fa-trash"></i></button></td>
+    `;
+    tablaDatos.appendChild(fila);
+  });
 
-    if (data.some(isNaN)) {
-      throw new Error("Todos los valores deben ser numéricos y separados por comas.");
+  // Eliminar fila
+  tablaDatos.addEventListener("click", (e) => {
+    if (e.target.closest(".eliminar-fila")) {
+      e.target.closest("tr").remove();
     }
-    return data;
-  };
+  });
 
-  form.addEventListener("submit", function (e) {
+  // Obtener los datos de la tabla
+  function obtenerDatosDeTabla() {
+    const filas = tablaDatos.querySelectorAll("tr");
+    const x = [];
+    const y = [];
+
+    filas.forEach(fila => {
+      const inputs = fila.querySelectorAll("input");
+      const xi = parseFloat(inputs[0].value);
+      const yi = parseFloat(inputs[1].value);
+
+      if (!isNaN(xi) && !isNaN(yi)) {
+        x.push(xi);
+        y.push(yi);
+      }
+    });
+
+    if (x.length === 0 || y.length === 0) {
+      throw new Error("Debes ingresar al menos un par de valores (x, y).");
+    }
+
+    if (x.length !== y.length) {
+      throw new Error("El número de días y alturas debe coincidir.");
+    }
+
+    return [x, y];
+  }
+
+  // Diferencias divididas
+  function diferenciasDivididas(x, y) {
+    const n = x.length;
+    const coef = y.slice();
+
+    for (let j = 1; j < n; j++) {
+      for (let i = n - 1; i >= j; i--) {
+        coef[i] = (coef[i] - coef[i - 1]) / (x[i] - x[i - j]);
+      }
+    }
+
+    return coef;
+  }
+
+  // Interpolación de Newton
+  function newtonInterpolacion(x, y, xEstimar) {
+    const coef = diferenciasDivididas(x, y);
+    let resultado = coef[0];
+    let producto = 1;
+
+    for (let i = 1; i < coef.length; i++) {
+      producto *= (xEstimar - x[i - 1]);
+      resultado += coef[i] * producto;
+    }
+
+    return resultado;
+  }
+
+  // Evento principal
+  calcularBtn.addEventListener("click", (e) => {
     e.preventDefault();
 
     try {
-      const dias = cleanInputData(document.getElementById("dias").value);
-      const alturas = cleanInputData(document.getElementById("alturas").value);
+      const [dias, alturas] = obtenerDatosDeTabla();
       const xEstimar = parseFloat(document.getElementById("valorEstimado").value);
 
-      if (dias.length === 0 || alturas.length === 0) {
-        throw new Error("Por favor ingresa valores para días y alturas");
-      }
-
-      if (dias.length !== alturas.length) {
-        throw new Error("El número de días y alturas debe coincidir");
-      }
-
       if (isNaN(xEstimar)) {
-        throw new Error("Ingresa un día válido para estimar");
-      }
-
-      function diferenciasDivididas(x, y) {
-        const n = x.length;
-        const coef = y.slice();
-
-        for (let j = 1; j < n; j++) {
-          for (let i = n - 1; i >= j; i--) {
-            coef[i] = (coef[i] - coef[i - 1]) / (x[i] - x[i - j]);
-          }
-        }
-
-        return coef;
-      }
-
-      function newtonInterpolacion(x, y, xEstimar) {
-        const coef = diferenciasDivididas(x, y);
-        let resultado = coef[0];
-        let producto = 1;
-
-        for (let i = 1; i < coef.length; i++) {
-          producto *= (xEstimar - x[i - 1]);
-          resultado += coef[i] * producto;
-        }
-
-        return resultado;
+        throw new Error("Ingresa un valor válido para el día a estimar.");
       }
 
       const resultadoFinal = newtonInterpolacion(dias, alturas, xEstimar);
 
+      // Mostrar resultado
       resultado.innerHTML = `
         <div class="d-flex align-items-center">
           <i class="fas fa-check-circle fa-2x me-3"></i>
@@ -78,14 +109,14 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       resultado.className = "alert alert-success";
 
-      // Generar tabla y puntos para el gráfico desde min hasta max
+      // Generar tabla de resultados y puntos para el gráfico
       const minX = Math.min(...dias);
       const maxX = Math.max(...dias);
       const step = 0.1;
       const puntosX = [];
       const puntosY = [];
 
-      tablaBody.innerHTML = "";
+      tablaResultadosBody.innerHTML = "";
       for (let x = minX; x <= maxX; x += step) {
         const y = newtonInterpolacion(dias, alturas, x);
         const xRounded = parseFloat(x.toFixed(2));
@@ -98,12 +129,10 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${xRounded}</td>
           <td class="fw-bold">${yRounded} cm</td>
         `;
-        tablaBody.appendChild(fila);
+        tablaResultadosBody.appendChild(fila);
       }
 
-      if (grafico) {
-        grafico.destroy();
-      }
+      if (grafico) grafico.destroy();
 
       grafico = new Chart(ctx, {
         type: "line",
@@ -149,9 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
             title: {
               display: true,
               text: "Crecimiento estimado de la planta",
-              font: {
-                size: 16
-              }
+              font: { size: 16 }
             },
             tooltip: {
               callbacks: {

@@ -65,25 +65,34 @@
               <i class="fas fa-calculator text-primary me-2"></i> Datos de Entrada
             </h3>
             <form id="interpolation-form" class="row g-3">
-              <div class="col-md-4">
-                <label for="horas" class="form-label fw-bold">
-                  <i class="fas fa-clock text-secondary me-1"></i> Horas (x)
-                </label>
-                <input type="text" class="form-control form-control-lg" id="horas" placeholder="Ej: 8,12,15,18,22" required />
-                <div class="form-text">Separadas por comas (0-24)</div>
+              <div class="col-12">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="data-table">
+                    <thead class="table-danger">
+                      <tr>
+                        <th>Hora (x)</th>
+                        <th>Temperatura (°C) (y)</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><input type="number" class="form-control hora-input" min="0" max="24" step="1" required></td>
+                        <td><input type="number" class="form-control temp-input" required></td>
+                        <td><button type="button" class="btn btn-danger btn-sm remove-row"><i class="fas fa-trash"></i></button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" id="add-row" class="btn btn-primary btn-sm mt-2">
+                  <i class="fas fa-plus"></i> Agregar fila
+                </button>
               </div>
-              <div class="col-md-4">
-                <label for="temperaturas" class="form-label fw-bold">
-                  <i class="fas fa-temperature-high text-secondary me-1"></i> Temperaturas (y)
-                </label>
-                <input type="text" class="form-control form-control-lg" id="temperaturas" placeholder="Ej: 18,25,27,23,19" required />
-                <div class="form-text">Separadas por comas (en °C)</div>
-              </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label for="horaEstimada" class="form-label fw-bold">
                   <i class="fas fa-search text-secondary me-1"></i> Hora a estimar
                 </label>
-                <input type="number" class="form-control form-control-lg" id="horaEstimada" placeholder="Ej: 13.5" step="0.1" min="0" max="24" required />
+                <input type="number" class="form-control form-control-lg" id="horaEstimada" placeholder="Ej: 13.5" step="1" min="0" max="24" required />
               </div>
               <div class="col-12 mt-3">
                 <button type="submit" class="btn btn-danger btn-lg w-100 py-3 fw-bold">

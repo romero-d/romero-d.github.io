@@ -65,21 +65,30 @@
               <i class="fas fa-microchip text-primary me-2"></i> Lecturas del Sensor
             </h3>
             <form id="interpolation-form" class="row g-3">
-              <div class="col-md-4">
-                <label for="horas" class="form-label fw-bold">
-                  <i class="fas fa-clock text-secondary me-1"></i> Tiempos con datos (h)
-                </label>
-                <input type="text" class="form-control form-control-lg" id="horas" placeholder="Ej: 6,8,11,13,16" required />
-                <div class="form-text">Separados por comas (en horas)</div>
+              <div class="col-12">
+                <div class="table-responsive">
+                  <table class="table table-bordered" id="data-table">
+                    <thead class="table-warning">
+                      <tr>
+                        <th>Tiempo (h)</th>
+                        <th>Lectura</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><input type="number" class="form-control time-input" step="1" required></td>
+                        <td><input type="number" class="form-control reading-input" step="1" required></td>
+                        <td><button type="button" class="btn btn-warning btn-sm remove-row"><i class="fas fa-trash"></i></button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <button type="button" id="add-row" class="btn btn-warning btn-sm mt-2">
+                  <i class="fas fa-plus"></i> Agregar fila
+                </button>
               </div>
-              <div class="col-md-4">
-                <label for="temperaturas" class="form-label fw-bold">
-                  <i class="fas fa-signal text-secondary me-1"></i> Lecturas registradas
-                </label>
-                <input type="text" class="form-control form-control-lg" id="temperaturas" placeholder="Ej: 22.1,21.9,22.7,23.2,22.8" required />
-                <div class="form-text">Separadas por comas (°C u otra unidad)</div>
-              </div>
-              <div class="col-md-4">
+              <div class="col-md-6">
                 <label for="horaEstimada" class="form-label fw-bold">
                   <i class="fas fa-search text-secondary me-1"></i> Hora a estimar
                 </label>

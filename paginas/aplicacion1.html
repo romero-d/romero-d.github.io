@@ -64,33 +64,39 @@
             <h3 class="card-title mb-4">
               <i class="fas fa-calculator text-primary me-2"></i> Datos de Entrada
             </h3>
-            <form id="interpolation-form" class="row g-3">
-              <div class="col-md-4">
-                <label for="dias" class="form-label fw-bold">
-                  <i class="fas fa-calendar-day text-secondary me-1"></i> Días (x)
-                </label>
-                <input type="text" class="form-control form-control-lg" id="dias" placeholder="Ej: 0,4,7,12,14" required />
-                <div class="form-text">Separados por comas</div>
-              </div>
-              <div class="col-md-4">
-                <label for="alturas" class="form-label fw-bold">
-                  <i class="fas fa-ruler-vertical text-secondary me-1"></i> Alturas (y)
-                </label>
-                <input type="text" class="form-control form-control-lg" id="alturas" placeholder="Ej: 0,3,7,13,21" required />
-                <div class="form-text">Separadas por comas (en cm)</div>
-              </div>
-              <div class="col-md-4">
-                <label for="valorEstimado" class="form-label fw-bold">
-                  <i class="fas fa-search text-secondary me-1"></i> Día a estimar
-                </label>
-                <input type="number" class="form-control form-control-lg" id="valorEstimado" placeholder="Ej: 2.5" step="0.1" required />
-              </div>
-              <div class="col-12 mt-3">
-                <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold">
-                  <i class="fas fa-chart-line me-2"></i> Calcular Interpolación
-                </button>
-              </div>
-            </form>
+
+            <div class="table-responsive mb-3">
+              <table class="table table-bordered" id="tablaDatos">
+                <thead class="table-light">
+                  <tr>
+                    <th>Día (x)</th>
+                    <th>Altura (y)</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="number" class="form-control" placeholder="Ej: 0" /></td>
+                    <td><input type="number" class="form-control" placeholder="Ej: 0" /></td>
+                    <td><button type="button" class="btn btn-danger btn-sm eliminar-fila"><i class="fas fa-trash"></i></button></td>
+                  </tr>
+                </tbody>
+              </table>
+              <button type="button" class="btn btn-secondary btn-sm" id="agregarFila">
+                <i class="fas fa-plus-circle me-1"></i> Agregar fila
+              </button>
+            </div>
+
+            <div class="mb-3">
+              <label for="valorEstimado" class="form-label fw-bold">
+                <i class="fas fa-search text-secondary me-1"></i> Día a estimar
+              </label>
+              <input type="number" class="form-control form-control-lg" id="valorEstimado" placeholder="Ej: 2.5" step="0.1" required />
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold" id="calcularBtn">
+              <i class="fas fa-chart-line me-2"></i> Calcular Interpolación
+            </button>
           </div>
         </div>
 
